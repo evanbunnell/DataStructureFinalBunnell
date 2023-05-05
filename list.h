@@ -11,10 +11,10 @@ public:
     bool search(string name);
     void Delete(string name);
     void display();
-    void peak();
     int size();
     void sort();
     void emplace(Character character);
+    void rePrio(int prio, int count, int MAX_COUNT);
     void rePrio();
 private:
     struct Node {

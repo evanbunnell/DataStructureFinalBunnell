@@ -1,7 +1,7 @@
 /***************************************************************
-* Name        : Class Name
+* Name        : List
 * Author      : Evan Bunnell
-* Created     : 4/24/2019
+* Created     : 5/4/2023
 ***************************************************************/
 #include "list.h"
 #include <iostream>
@@ -13,12 +13,26 @@ const int MAX_TANK = 2;
 const int MAX_HEAL = 2;
 const int MAX_DPS = 2;
 
+/**************************************************************
+* Name: Character
+* Description: Default no-arg constructor
+* Input parameters: none
+***************************************************************/
 List::List() {
     tank = 0;
     healer = 0;
     dps = 0;
 }
-
+/***************************************************************
+* Class Functions
+***************************************************************/
+/**************************************************************
+* Name: insert
+* Description: Handles initial placement of object in the queue
+* and increments appropriate role variable
+* Input: Character
+* Output: n/a
+***************************************************************/
 void List::insert(Character character) {
     //iterate counters up
     if (character.getRole() == "tank") {
@@ -33,7 +47,12 @@ void List::insert(Character character) {
 
     emplace(character);
 }
-
+/**************************************************************
+* Name: emplace
+* Description: Emplaces object into queue
+* Input: Character
+* Output: n/a
+***************************************************************/
 void List::emplace(Character character) {
     Node *temp, *curr, *pre = NULL;
 
@@ -57,7 +76,12 @@ void List::emplace(Character character) {
         pre->next = temp;
     }
 }
-
+/**************************************************************
+* Name: search
+* Description: Searches for object in queue by name
+* Input: String
+* Output: Boolean
+***************************************************************/
 bool List::search(string name) {
     if (front == NULL) {
         return 0;
@@ -75,7 +99,13 @@ bool List::search(string name) {
         return 0;
     }
 }
-
+/**************************************************************
+* Name: Delete
+* Description: Deletes object from queue after search() confirms
+* existence
+* Input: String
+* Output: n/a
+***************************************************************/
 void List::Delete(string name) {
     if (front == NULL) {
         return;
@@ -90,17 +120,18 @@ void List::Delete(string name) {
             curr = curr->next;
         }
 
-        if (curr->character.getRole() == "tank") {
+        if (curr->character.priority == 1 || curr->character.priority == 4) {
             --tank;
         }
-        if (curr->character.getRole() == "healer") {
+        if (curr->character.priority == 2 || curr->character.priority == 5) {
             --healer;
         }
-        if (curr->character.getRole() == "dps") {
+        if (curr->character.priority == 3 || curr->character.priority == 6) {
             --dps;
         }
 
         cout << "\nDeleted character: " << curr->character.getName() << endl;
+
 
         if (curr == front) {
             front = curr->next;
@@ -109,7 +140,13 @@ void List::Delete(string name) {
         free (curr);
     }
 }
-
+/**************************************************************
+* Name: display
+* Description: Cycles through queue and calls Character print()
+* function per object, numbers list
+* Input: n/a
+* Output: Numbered list of all objects
+***************************************************************/
 void List::display() {
     if (front == NULL){
         cout << "\nRoster is empty." << endl;
@@ -133,11 +170,12 @@ void List::display() {
 
     return;
 }
-
-void List::peak() {
-    cout << "Peak element is :" << &front->character << endl;
-}
-
+/**************************************************************
+* Name: size
+* Description: Function for determining size of queue
+* Input: n/a
+* Output: Int
+***************************************************************/
 int List::size() {
     int size = 0;
     if (front == NULL)
@@ -152,95 +190,65 @@ int List::size() {
 
     return size;
 }
+/**************************************************************
+* Name: sort
+* Description: Sorts list and changes priority based on MAX
+* variables
+* Input: n/a
+* Output: n/a
+***************************************************************/
 
 void List::sort() {
-    int i;
+    int tCount = 0, hCount = 0, dCount = 0;
 
     Node *curr, *pre;
     curr = front;
 
-    cout << "Tanks: " << tank << endl << "Healers: " << healer << endl << "DPS: " << dps << endl;
-
-    rePrio();
+    //cout << "Tanks: " << tank << endl << "Healers: " << healer << endl << "DPS: " << dps << endl;     //FOR TESTING PURPOSES ONLY
 
     if (tank > MAX_TANK) {
-        for (i = 0; i < MAX_TANK; i++) {
-            pre = curr;
-            curr = curr->next;
-        }
-        while (curr and curr->character.getRole() == "tank") {
-            curr->character.priority += 3;
+        while (curr and curr->character.priority <= 1) {
+            if (curr->character.priority == 1) ++tCount;
+            if (tCount > MAX_TANK) {
+                curr->character.priority += 3;
 
-            emplace(curr->character);
+                emplace(curr->character);
 
-            pre->next = curr->next;
-
-            pre = curr;
-            curr = curr->next;
+                pre->next = curr->next;
+            }
+        pre = curr;
+        curr = curr->next;
         }
     }
+    else rePrio();
 
-    curr = front;
     if (healer > MAX_HEAL) {
-        if (tank > MAX_TANK) {
-            for (i = 0; i < MAX_TANK + MAX_HEAL; i++) {
-                pre = curr;
-                curr = curr->next;
+        while (curr and curr->character.priority <= 2) {
+            if (curr->character.priority == 2) ++hCount;
+            if (hCount > MAX_HEAL) {
+                curr->character.priority += 3;
+
+                emplace(curr->character);
+
+                pre->next = curr->next;
             }
-        }
-        else {
-            for (i = 0; i < tank + MAX_HEAL; i++) {
-            pre = curr;
-            curr = curr->next;
-            }
-        }
-        while (curr and curr->character.getRole() == "healer") {
-            curr->character.priority += 3;
-
-            emplace(curr->character);
-
-            pre->next = curr->next;
-
-            pre = curr;
-            curr = curr->next;
+        pre = curr;
+        curr = curr->next;
         }
     }
 
-    curr = front;
     if (dps > MAX_DPS) {
-        if (tank > MAX_TANK && healer > MAX_HEAL) {
-            for (i = 0; i < MAX_TANK + MAX_HEAL + MAX_DPS; i++) {
-                pre = curr;
-                curr = curr->next;
-            }
-        }
-        else if (tank > MAX_TANK){
-            for (i = 0; i < MAX_TANK + healer + MAX_DPS; i++) {
-            pre = curr;
-            curr = curr->next;
-            }
-        }
-        else if (healer > MAX_HEAL){
-            for (i = 0; i < tank + MAX_HEAL + MAX_DPS; i++) {
-            pre = curr;
-            curr = curr->next;
-            }
-        }
-        else {
-            for (i = 0; i < tank + healer + MAX_DPS; i++) {
-                pre = curr;
-                curr = curr->next;
-            }
-        }
-        while (curr and curr->character.getRole() == "dps") {
-            curr->character.priority += 3;
+        while (curr and curr->character.priority <= 3) {
+            if (curr->character.priority == 3) ++dCount;
+            if (dCount > MAX_DPS) {
+                curr->character.priority += 3;
 
-            emplace(curr->character);
+                emplace(curr->character);
 
-            pre->next = curr->next;
-
-            pre = curr;
-            curr = curr->next;
+                pre->next = curr->next;
+            }
+        pre = curr;
+        curr = curr->next;
         }
     }
 }
@@ -253,6 +261,7 @@ void List::sort() {
 * Input: n/a
 * Output: n/a
 ***************************************************************/
+
 void List::rePrio() {
     Node *curr, *pre;
 

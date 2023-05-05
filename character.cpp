@@ -71,7 +71,7 @@ void Character::print() {
             cout << " [Backup]" << endl;
         }
         else cout << endl;
-        cout << "Priority: " << priority << endl;   //FOR TESTING ONLY
+        //cout << "Priority: " << priority << endl;   //FOR TESTING ONLY
     }
     else {
         cout << "Name: " << name << "\t\tClass: " << Class << "\tRole: " << role;
@@ -79,7 +79,7 @@ void Character::print() {
                 cout << " [Backup]" << endl;
             }
             else cout << endl;
-        cout << "Priority: " << priority << endl;   //FOR TESTING ONLY
+        //cout << "Priority: " << priority << endl;   //FOR TESTING ONLY
     }
 }
 /**************************************************************
